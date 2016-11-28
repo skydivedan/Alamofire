@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// The task delegate is responsible for handling all delegate callbacks for the underlying task as well as
 /// executing all operations attached to the serial operation queue upon task completion.
@@ -400,6 +401,64 @@ class DownloadTaskDelegate: TaskDelegate, URLSessionDownloadDelegate {
             progress.totalUnitCount = expectedTotalBytes
             progress.completedUnitCount = fileOffset
         }
+    }
+}
+
+// MARK: -
+
+@available(iOSApplicationExtension 9.0, *)
+class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
+    
+    // MARK: Properties
+    
+    var avAssetDownloadTask: AVAssetDownloadTask { return task as! AVAssetDownloadTask }
+    
+    var progress: Progress
+    var progressHandler: (closure: Request.ProgressHandler, queue: DispatchQueue)?
+    
+    // MARK: Lifecycle
+    
+    init(avTask: AVAssetDownloadTask?) {
+        progress = Progress(totalUnitCount: 0)
+      //  guard let task
+        
+        super.init(task: avTask)
+    }
+    
+    override func reset() {
+        super.reset()
+        progress = Progress(totalUnitCount: 0)
+    }
+    
+    // MARK: AVAssetDownloadDelegate
+    
+    open var avSessionDownloadTaskDidFinishLoadingTo: ((URLSession, AVAssetDownloadTask, URL) -> Void)?
+    open var avSessionDownloadDidLoadRanges: ((URLSession, AVAssetDownloadTask, CMTimeRange, [NSValue], CMTimeRange) -> Void)?
+    open var avSessionDownloadDidResolve: ((URLSession, AVAssetDownloadTask, AVMediaSelection) -> Void)?
+    
+    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didFinishDownloadingTo location: URL) {
+        avSessionDownloadTaskDidFinishLoadingTo?(session, assetDownloadTask, location)
+    }
+    
+    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {
+        if let avSessionDownloadDidLoadRanges = avSessionDownloadDidLoadRanges {
+            avSessionDownloadDidLoadRanges(session, assetDownloadTask, timeRange, loadedTimeRanges, timeRangeExpectedToLoad)
+        } else {
+            progress.totalUnitCount = Int64(timeRangeExpectedToLoad.duration.seconds)
+            
+            progress.completedUnitCount = Int64(loadedTimeRanges.reduce(0, { (result: Double, value: NSValue) -> Double in
+                let loadedTimeRange = value.timeRangeValue
+                return result + loadedTimeRange.duration.seconds
+            }))
+
+            if let progressHandler = progressHandler {
+                progressHandler.queue.async { progressHandler.closure(self.progress) }
+            }
+        }
+    }
+    
+    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didResolve resolvedMediaSelection: AVMediaSelection) {
+        avSessionDownloadDidResolve?(session, assetDownloadTask, resolvedMediaSelection)
     }
 }
 

@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// Responsible for creating and managing `Request` objects, as well as their underlying `NSURLSession`.
 open class SessionManager {
@@ -884,4 +885,18 @@ open class SessionManager {
             }
         }
     }
+}
+
+@available(iOSApplicationExtension 9.0, *)
+open class AVAssetDownloadSessionManager : SessionManager {
+    // MARK: - Properties
+    
+    init(backgroundIdentifier: String, delegate: AVDownloadSessionDelegate, serverTrustPolicyManager: ServerTrustPolicyManager?) {
+        let configuration = URLSessionConfiguration.background(withIdentifier: "avBackground")
+        let session = AVAssetDownloadURLSession(configuration: configuration, assetDownloadDelegate: delegate, delegateQueue: nil)
+        
+        super.init(session: session, delegate: delegate, serverTrustPolicyManager: serverTrustPolicyManager)!
+    }
+    
+    
 }

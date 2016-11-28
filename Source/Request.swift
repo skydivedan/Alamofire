@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// A type that can inspect and optionally adapt a `URLRequest` in some manner if necessary.
 public protocol RequestAdapter {
@@ -82,6 +83,8 @@ open class Request {
         case download(TaskConvertible?, URLSessionTask?)
         case upload(TaskConvertible?, URLSessionTask?)
         case stream(TaskConvertible?, URLSessionTask?)
+        @available(iOSApplicationExtension 9.0, *)
+        case avAssetDownload(TaskConvertible?, AVAssetDownloadTask?)
     }
 
     // MARK: Properties
@@ -138,6 +141,13 @@ open class Request {
         case .upload(let originalTask, let task):
             taskDelegate = UploadTaskDelegate(task: task)
             self.originalTask = originalTask
+        case .avAssetDownload(let originalTask, let task):
+            if #available(iOSApplicationExtension 9.0, *) {
+                taskDelegate = AVAssetDownloadTaskDelegate(avTask: task)
+                self.originalTask = originalTask
+            } else {
+                // Fallback on earlier versions
+            }
         case .stream(let originalTask, let task):
             taskDelegate = TaskDelegate(task: task)
             self.originalTask = originalTask
@@ -541,6 +551,39 @@ open class DownloadRequest: Request {
             }
 
             return (temporaryURL, [])
+        }
+    }
+}
+
+// MARK: -
+
+enum AVSessionError: Error {
+    case NotAVAssetDownloadURLSession
+    case SystemNotIOS10
+}
+
+@available(iOS 9.0, *)
+open class AVAssetDownloadRequest: Request {
+    
+    enum AVAssetDownloadable: TaskConvertible {
+        case assetFileURL(AVURLAsset, URL, [String: Any]?)
+        @available(iOSApplicationExtension 10.0, *)
+        case assetTitleArtwork(AVURLAsset, String, Data?, [String: Any]?)
+        
+        func task(session: URLSession, adapter: RequestAdapter?, queue: DispatchQueue) throws -> URLSessionTask {
+            guard let avSession = session as? AVAssetDownloadURLSession else { throw AVSessionError.NotAVAssetDownloadURLSession }
+            
+            switch self {
+            case let .assetTitleArtwork(asset, title, artworkData, options):
+                if #available(iOSApplicationExtension 10.0, *) {
+
+                    return avSession.makeAssetDownloadTask(asset: asset, assetTitle: title, assetArtworkData: artworkData, options: options)!
+                } else {
+                    throw AVSessionError.SystemNotIOS10
+                }
+            case let .assetFileURL(asset, fileURL, options):
+                return avSession.makeAssetDownloadTask(asset: asset, destinationURL: fileURL, options: options)!
+            }
         }
     }
 }
