@@ -144,10 +144,10 @@ open class Request {
         case .avAssetDownload(let originalTask, let task):
             if #available(iOSApplicationExtension 9.0, *) {
                 taskDelegate = AVAssetDownloadTaskDelegate(avTask: task)
-                self.originalTask = originalTask
             } else {
-                // Fallback on earlier versions
+                taskDelegate = AVErrorDelegate(task: task)
             }
+            self.originalTask = originalTask
         case .stream(let originalTask, let task):
             taskDelegate = TaskDelegate(task: task)
             self.originalTask = originalTask

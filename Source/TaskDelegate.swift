@@ -463,6 +463,21 @@ class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
 }
 
 // MARK: -
+/// The sole purpose of AVErrorDelegate is to return an error when used prior to iOS 9.
+class AVErrorDelegate : TaskDelegate {
+    override var error: Error? {
+        get {
+            enum AVErrorDelegateError: Error {
+                case AVDownloadNotAvailable
+            }
+            
+            return AVErrorDelegateError.AVDownloadNotAvailable
+        }
+        set {}
+    }
+}
+
+// MARK: -
 
 class UploadTaskDelegate: DataTaskDelegate {
 
