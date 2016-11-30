@@ -9,7 +9,7 @@
 import AVFoundation
 
 @available(iOSApplicationExtension 9.0, *)
-class AVDownloadSessionDelegate: SessionDelegate {
+open class AVDownloadSessionDelegate: SessionDelegate {
 
     // MARK: AVAssetDownloadDelegate Overrides
     
@@ -27,7 +27,7 @@ class AVDownloadSessionDelegate: SessionDelegate {
 @available(iOSApplicationExtension 9.0, *)
 extension AVDownloadSessionDelegate : AVAssetDownloadDelegate {
     
-    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didFinishDownloadingTo location: URL) {
+    public func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didFinishDownloadingTo location: URL) {
         if let avSessionDownloadTaskDidFinishLoadingTo = avSessionDownloadTaskDidFinishLoadingTo {
             avSessionDownloadTaskDidFinishLoadingTo(session, assetDownloadTask, location)
         } else if let delegate = self[assetDownloadTask]?.delegate as? AVAssetDownloadTaskDelegate {
@@ -36,7 +36,7 @@ extension AVDownloadSessionDelegate : AVAssetDownloadDelegate {
 
     }
     
-    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {
+    public func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {
         if let avSessionDownloadDidLoadRanges = avSessionDownloadDidLoadRanges {
             avSessionDownloadDidLoadRanges(session, assetDownloadTask, timeRange, loadedTimeRanges, timeRangeExpectedToLoad)
         } else if let delegate = self[assetDownloadTask]?.delegate as? AVAssetDownloadTaskDelegate {
@@ -44,7 +44,7 @@ extension AVDownloadSessionDelegate : AVAssetDownloadDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didResolve resolvedMediaSelection: AVMediaSelection) {
+    public func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didResolve resolvedMediaSelection: AVMediaSelection) {
         if let avSessionDownloadDidResolve = avSessionDownloadDidResolve {
             avSessionDownloadDidResolve(session, assetDownloadTask, resolvedMediaSelection)
         } else if let delegate = self[assetDownloadTask]?.delegate as? AVAssetDownloadTaskDelegate {

@@ -891,22 +891,54 @@ open class SessionManager {
 open class AVAssetDownloadSessionManager : SessionManager {
     // MARK: - Properties
     
-    init(backgroundIdentifier: String, delegate: AVDownloadSessionDelegate, serverTrustPolicyManager: ServerTrustPolicyManager?) {
-        let configuration = URLSessionConfiguration.background(withIdentifier: "avBackground")
+    // MARK: - Lifecycle
+    
+    /// Creates an instance with the specified `backgroundIdentifier`, `delegate` and `serverTrustPolicyManager`.
+    ///
+    /// - parameter backgroundIdentifier:            A string that identifies the background session.
+    /// - parameter delegate:                 The delegate used when initializing the session. `SessionDelegate()` by
+    ///                                       default.
+    /// - parameter serverTrustPolicyManager: The server trust policy manager to use for evaluating all server trust
+    ///                                       challenges. `nil` by default.
+    ///
+    /// - returns: The new `SessionManager` instance.
+    public init(backgroundIdentifier: String, delegate: AVDownloadSessionDelegate, serverTrustPolicyManager: ServerTrustPolicyManager?) {
+        let configuration = URLSessionConfiguration.background(withIdentifier: backgroundIdentifier)
         let session = AVAssetDownloadURLSession(configuration: configuration, assetDownloadDelegate: delegate, delegateQueue: nil)
         
         super.init(session: session, delegate: delegate, serverTrustPolicyManager: serverTrustPolicyManager)!
     }
     
+    // MARK: - Download AVAsset Request
+    
+    // MARK: AVURLAsset with title and artwork-data
+    
+    /// Creates a `AVAssetDownloadRequest` to retrieve offline AVAsset the specified `asset`, `title`, `data`, `options`.
+    ///
+    /// - parameter asset:       The AVURLAsset to be downloaded for offline viewing.
+    /// - parameter title:       The title of the download, used to identify the asset while downloading.
+    /// - parameter options:     The options, see AVAssetDownloadTask*Key.
+    ///
+    /// - returns: The created `AVAssetDownloadRequest`.
     @available(iOSApplicationExtension 10.0, *)
     @discardableResult
     open func downloadAVAsset(asset: AVURLAsset, title: String, data: Data?, options: [String: Any]?) -> AVAssetDownloadRequest {
         return downloadAVAsset(.assetTitleArtwork(asset, title, data, options))
     }
     
+    /// Creates a `AVAssetDownloadRequest` to retrieve offline AVAsset the specified `asset`, `destFileURL`, `options`.
+    ///
+    /// - parameter asset:       The AVURLAsset to be downloaded for offline viewing.
+    /// - parameter destFileURL: The fileURL of the destination where the asset will be saved.
+    /// - parameter options:     The options, see AVAssetDownloadTask*Key.
+    ///
+    /// - returns: The created `AVAssetDownloadRequest`.
+    @available(iOS, introduced: 9.0, deprecated: 10.0)
     open func downloadAVAsset(asset: AVURLAsset, destFileURL: URL, options: [String: Any]?) -> AVAssetDownloadRequest {
         return downloadAVAsset(.assetFileURL(asset, destFileURL, options))
     }
+    
+    // MARK: Private - Download AV Asset implementation
     
     private func downloadAVAsset(_ avDownloadable: AVAssetDownloadRequest.AVAssetDownloadable) -> AVAssetDownloadRequest {
         do {

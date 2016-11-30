@@ -692,6 +692,13 @@ open class AVAssetDownloadRequest: Request {
         }
     }
 
+    
+    /// The AVAsset that can be played be used with an AVPlayerItem, during download
+    open var avAsset: AVURLAsset {
+        let avAssetDownloadTask  = task as! AVAssetDownloadTask
+        return avAssetDownloadTask.urlAsset
+    }
+
     /// The progress of downloading the response data from the server for the request.
     open var progress: Progress { return avAssetDownloadDelegate.progress }
     
