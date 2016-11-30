@@ -898,5 +898,34 @@ open class AVAssetDownloadSessionManager : SessionManager {
         super.init(session: session, delegate: delegate, serverTrustPolicyManager: serverTrustPolicyManager)!
     }
     
+    @available(iOSApplicationExtension 10.0, *)
+    @discardableResult
+    open func downloadAVAsset(asset: AVURLAsset, title: String, data: Data?, options: [String: Any]?) -> AVAssetDownloadRequest {
+        return downloadAVAsset(.assetTitleArtwork(asset, title, data, options))
+    }
     
+    open func downloadAVAsset(asset: AVURLAsset, destFileURL: URL, options: [String: Any]?) -> AVAssetDownloadRequest {
+        return downloadAVAsset(.assetFileURL(asset, destFileURL, options))
+    }
+    
+    private func downloadAVAsset(_ avDownloadable: AVAssetDownloadRequest.AVAssetDownloadable) -> AVAssetDownloadRequest {
+        do {
+            let task = try avDownloadable.task(session: session, adapter: adapter, queue: queue)
+            let request = AVAssetDownloadRequest(session: session, requestTask: .avAssetDownload(avDownloadable, task))
+            
+            delegate[task] = request
+            
+            if startRequestsImmediately { request.resume() }
+            
+            return request
+        } catch {
+            return downloadAVAsset(failedWith: error)
+        }
+    }
+    
+    private func downloadAVAsset(failedWith error: Error) -> AVAssetDownloadRequest {
+        let downloadAVAsset = AVAssetDownloadRequest(session: session, requestTask: .avAssetDownload(nil, nil), error: error)
+        if startRequestsImmediately { downloadAVAsset.resume() }
+        return downloadAVAsset
+    }
 }
