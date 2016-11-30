@@ -691,5 +691,24 @@ open class AVAssetDownloadRequest: Request {
             }
         }
     }
+
+    /// The progress of downloading the response data from the server for the request.
+    open var progress: Progress { return avAssetDownloadDelegate.progress }
+    
+    var avAssetDownloadDelegate: AVAssetDownloadTaskDelegate { return delegate as! AVAssetDownloadTaskDelegate }
+
+    // MARK: Progress
+    
+    /// Sets a closure to be called periodically during the lifecycle of the `Request` as data is read from the server.
+    ///
+    /// - parameter queue:   The dispatch queue to execute the closure on.
+    /// - parameter closure: The code to be executed periodically as data is read from the server.
+    ///
+    /// - returns: The request.
+    @discardableResult
+    open func downloadProgress(queue: DispatchQueue = DispatchQueue.main, closure: @escaping ProgressHandler) -> Self {
+        avAssetDownloadDelegate.progressHandler = (closure, queue)
+        return self
+    }
 }
 
