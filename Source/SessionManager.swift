@@ -922,8 +922,13 @@ open class AVAssetDownloadSessionManager : SessionManager {
     /// - returns: The created `AVAssetDownloadRequest`.
     @available(iOSApplicationExtension 10.0, *)
     @discardableResult
-    open func downloadAVAsset(asset: AVURLAsset, title: String, data: Data?, options: [String: Any]?) -> AVAssetDownloadRequest {
-        return downloadAVAsset(.assetTitleArtwork(asset, title, data, options))
+    open func downloadAVAsset(
+        asset: AVURLAsset,
+        title: String,
+        data: Data? = nil,
+        options: [String: Any]? = nil,
+        location: AVAssetDownloadRequest.AssetDestination? = nil) -> AVAssetDownloadRequest {
+        return downloadAVAsset(.assetTitleArtwork(asset, title, data, options), location: location)
     }
     
     /// Creates a `AVAssetDownloadRequest` to retrieve offline AVAsset the specified `asset`, `destFileURL`, `options`.
@@ -934,16 +939,24 @@ open class AVAssetDownloadSessionManager : SessionManager {
     ///
     /// - returns: The created `AVAssetDownloadRequest`.
     @available(iOS, introduced: 9.0, deprecated: 10.0)
-    open func downloadAVAsset(asset: AVURLAsset, destFileURL: URL, options: [String: Any]?) -> AVAssetDownloadRequest {
-        return downloadAVAsset(.assetFileURL(asset, destFileURL, options))
+    open func downloadAVAsset(
+        asset: AVURLAsset,
+        destFileURL: URL,
+        options: [String: Any]? = nil,
+        location: AVAssetDownloadRequest.AssetDestination? = nil) -> AVAssetDownloadRequest {
+        return downloadAVAsset(.assetFileURL(asset, destFileURL, options), location: location)
     }
     
     // MARK: Private - Download AV Asset implementation
     
-    private func downloadAVAsset(_ avDownloadable: AVAssetDownloadRequest.AVAssetDownloadable) -> AVAssetDownloadRequest {
+    private func downloadAVAsset(
+        _ avDownloadable: AVAssetDownloadRequest.AVAssetDownloadable,
+        location: AVAssetDownloadRequest.AssetDestination?) -> AVAssetDownloadRequest {
         do {
             let task = try avDownloadable.task(session: session, adapter: adapter, queue: queue)
             let request = AVAssetDownloadRequest(session: session, requestTask: .avAssetDownload(avDownloadable, task))
+            
+            request.avAssetDownloadDelegate.location = location
             
             delegate[task] = request
             

@@ -233,6 +233,7 @@
 		4DD67C251A5C590000ED2280 /* Alamofire.swift in Sources */ = {isa = PBXBuildFile; fileRef = F897FF4019AA800700AB5182 /* Alamofire.swift */; };
 		6452770D1DEA85FF00E582CE /* AVDownloadSessionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6452770C1DEA85FF00E582CE /* AVDownloadSessionDelegate.swift */; };
 		8035DB621BAB492500466CB3 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8111E3319A95C8B0040E7D1 /* Alamofire.framework */; };
+		BAD00F071DF068CB0025FDBE /* AVAssetDownloadResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD00F061DF068CB0025FDBE /* AVAssetDownloadResponse.swift */; };
 		E4202FD01B667AA100C997FB /* ParameterEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE2724E1AF88FB500F1D59A /* ParameterEncoding.swift */; };
 		E4202FD11B667AA100C997FB /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE2C391AF899EC00BABAE5 /* Request.swift */; };
 		E4202FD21B667AA100C997FB /* ResponseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDE2C451AF89FF300BABAE5 /* ResponseSerialization.swift */; };
@@ -357,6 +358,7 @@
 		B39E2F871C1A72F8002DA1A9 /* certPEM.crt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = certPEM.crt; path = selfSignedAndMalformedCerts/certPEM.crt; sourceTree = "<group>"; };
 		B39E2F891C1A72F8002DA1A9 /* randomGibberish.crt */ = {isa = PBXFileReference; lastKnownFileType = file; name = randomGibberish.crt; path = selfSignedAndMalformedCerts/randomGibberish.crt; sourceTree = "<group>"; };
 		B39E2F8A1C1A72F8002DA1A9 /* keyDER.der */ = {isa = PBXFileReference; lastKnownFileType = file; name = keyDER.der; path = selfSignedAndMalformedCerts/keyDER.der; sourceTree = "<group>"; };
+		BAD00F061DF068CB0025FDBE /* AVAssetDownloadResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAssetDownloadResponse.swift; sourceTree = "<group>"; };
 		E4202FE01B667AA100C997FB /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8111E3319A95C8B0040E7D1 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8111E3719A95C8B0040E7D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -588,6 +590,7 @@
 				4C1DC8531B68908E00476DE3 /* AFError.swift */,
 				6452770C1DEA85FF00E582CE /* AVDownloadSessionDelegate.swift */,
 				4CB928281C66BFBC00CE5F08 /* Notifications.swift */,
+				BAD00F061DF068CB0025FDBE /* AVAssetDownloadResponse.swift */,
 				4CE2724E1AF88FB500F1D59A /* ParameterEncoding.swift */,
 				4CDE2C391AF899EC00BABAE5 /* Request.swift */,
 				4C0B62501BB1001C009302D3 /* Response.swift */,
@@ -1250,6 +1253,7 @@
 				4CDE2C3A1AF899EC00BABAE5 /* Request.swift in Sources */,
 				6452770D1DEA85FF00E582CE /* AVDownloadSessionDelegate.swift in Sources */,
 				4CDE2C461AF89FF300BABAE5 /* ResponseSerialization.swift in Sources */,
+				BAD00F071DF068CB0025FDBE /* AVAssetDownloadResponse.swift in Sources */,
 				4C1DC8541B68908E00476DE3 /* AFError.swift in Sources */,
 				4CDE2C371AF8932A00BABAE5 /* SessionManager.swift in Sources */,
 				4C0B62511BB1001C009302D3 /* Response.swift in Sources */,

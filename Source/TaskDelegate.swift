@@ -480,6 +480,8 @@ class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
     var progress: Progress
     var progressHandler: (closure: Request.ProgressHandler, queue: DispatchQueue)?
     
+    var location: AVAssetDownloadRequest.AssetDestination?
+    
     // MARK: Lifecycle
     override init(task: URLSessionTask?) {
         progress = Progress(totalUnitCount: 0)
@@ -500,7 +502,8 @@ class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
     open var avSessionDownloadDidResolve: ((URLSession, AVAssetDownloadTask, AVMediaSelection) -> Void)?
     
     func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didFinishDownloadingTo location: URL) {
-        avSessionDownloadTaskDidFinishLoadingTo?(session, assetDownloadTask, location)
+        
+        self.location?(location)
     }
     
     func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {

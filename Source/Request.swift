@@ -692,6 +692,8 @@ open class AVAssetDownloadRequest: Request {
         }
     }
 
+    /// A closure executed once the local file URL is established for the AVURLAsset.
+    public typealias AssetDestination = ( _ location: URL) -> ()
     
     /// The AVAsset that can be played be used with an AVPlayerItem, during download
     open var avAsset: AVURLAsset {
