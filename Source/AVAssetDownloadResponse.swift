@@ -10,9 +10,13 @@ import UIKit
 import AVFoundation
 
 /// Used to store all data associated with a response of a avAssetDownload request.
+@available(iOSApplicationExtension 9.0, *)
 public struct AVAssetDownloadResponse {
     /// The AVURLAsset that we began with.
     public let avURLAsset: AVURLAsset?
+    
+    /// The resolved media selection
+    public let resolvedMediaSelection: AVMediaSelection?
     
     /// The server's response to the URL request.
     public let response: HTTPURLResponse?
@@ -25,8 +29,9 @@ public struct AVAssetDownloadResponse {
     
     var _metrics: AnyObject?
     
-    init(avURLAsset: AVURLAsset?, response: HTTPURLResponse?, error: Error?, timeline: Timeline = Timeline()) {
+    init(avURLAsset: AVURLAsset?, resolvedMediaSelection: AVMediaSelection?, response: HTTPURLResponse?, error: Error?, timeline: Timeline = Timeline()) {
         self.avURLAsset = avURLAsset
+        self.resolvedMediaSelection = resolvedMediaSelection
         self.response = response
         self.error = error
         self.timeline = timeline
@@ -35,6 +40,7 @@ public struct AVAssetDownloadResponse {
 }
 // MARK: -
 
+@available(iOSApplicationExtension 9.0, *)
 extension AVAssetDownloadResponse: CustomStringConvertible, CustomDebugStringConvertible {
     /// The textual representation used when written to an output stream, which includes whether the result was a
     /// success or failure.
@@ -48,6 +54,7 @@ extension AVAssetDownloadResponse: CustomStringConvertible, CustomDebugStringCon
         var output: [String] = []
         
         output.append(avURLAsset != nil ? "[AVURLAsset]: \(avURLAsset!)" : "[AVURLAsset]: nil")
+        output.append(resolvedMediaSelection != nil ? "[AVMediaSelection]: \(resolvedMediaSelection!)" : "[AVMediaSelection]: nil")
         output.append(response != nil ? "[Response]: \(response!)" : "[Response]: nil")
         output.append("[Timeline]: \(timeline.debugDescription)")
         
@@ -78,6 +85,7 @@ extension AVAssetDownloadRequest {
             (queue ?? DispatchQueue.main).async {
                 var avAssetResponse = AVAssetDownloadResponse(
                     avURLAsset: self.avAsset,
+                    resolvedMediaSelection: self.avAssetDownloadDelegate.resolvedMediaSelection,
                     response: self.response,
                     error: self.delegate.error,
                     timeline: self.timeline

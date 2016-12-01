@@ -482,6 +482,8 @@ class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
     
     var location: AVAssetDownloadRequest.AssetDestination?
     
+    var resolvedMediaSelection: AVMediaSelection?
+    
     // MARK: Lifecycle
     override init(task: URLSessionTask?) {
         progress = Progress(totalUnitCount: 0)
@@ -524,6 +526,6 @@ class AVAssetDownloadTaskDelegate: TaskDelegate, AVAssetDownloadDelegate {
     }
     
     func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didResolve resolvedMediaSelection: AVMediaSelection) {
-        avSessionDownloadDidResolve?(session, assetDownloadTask, resolvedMediaSelection)
+        self.resolvedMediaSelection = resolvedMediaSelection
     }
 }
