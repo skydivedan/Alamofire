@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// A type that can inspect and optionally adapt a `URLRequest` in some manner if necessary.
 public protocol RequestAdapter {
@@ -82,6 +83,7 @@ open class Request {
         case download(TaskConvertible?, URLSessionTask?)
         case upload(TaskConvertible?, URLSessionTask?)
         case stream(TaskConvertible?, URLSessionTask?)
+        case avAssetDownload(TaskConvertible?, URLSessionTask?)
     }
 
     // MARK: Properties
@@ -137,6 +139,13 @@ open class Request {
             self.originalTask = originalTask
         case .upload(let originalTask, let task):
             taskDelegate = UploadTaskDelegate(task: task)
+            self.originalTask = originalTask
+        case .avAssetDownload(let originalTask, let task):
+            if #available(iOSApplicationExtension 9.0, *) {
+                taskDelegate = AVAssetDownloadTaskDelegate(task: task)
+            } else {
+                taskDelegate = AVErrorDelegate(task: task)
+            }
             self.originalTask = originalTask
         case .stream(let originalTask, let task):
             taskDelegate = TaskDelegate(task: task)
@@ -645,3 +654,70 @@ open class StreamRequest: Request {
 }
 
 #endif
+
+// MARK: -
+
+enum AVSessionError: Error {
+    case NotAVAssetDownloadURLSession
+    case SystemNotIOS10
+}
+
+@available(iOS 9.0, *)
+open class AVAssetDownloadRequest: Request {
+    
+    enum AVAssetDownloadable: TaskConvertible {
+        case assetFileURL(AVURLAsset, URL, [String: Any]?)
+        @available(iOSApplicationExtension 10.0, *)
+        case assetTitleArtwork(AVURLAsset, String, Data?, [String: Any]?)
+        case assetTaskInProgress(AVAssetDownloadTask)
+        
+        func task(session: URLSession, adapter: RequestAdapter?, queue: DispatchQueue) throws -> URLSessionTask {
+            guard let avSession = session as? AVAssetDownloadURLSession else { throw AVSessionError.NotAVAssetDownloadURLSession }
+            
+            switch self {
+            case let .assetTitleArtwork(asset, title, artworkData, options):
+                if #available(iOSApplicationExtension 10.0, *) {
+                    
+                    return avSession.makeAssetDownloadTask(asset: asset, assetTitle: title, assetArtworkData: artworkData, options: options)!
+                } else {
+                    throw AVSessionError.SystemNotIOS10
+                }
+            case let .assetFileURL(asset, fileURL, options):
+                return avSession.makeAssetDownloadTask(asset: asset, destinationURL: fileURL, options: options)!
+                
+            // is this necessary? If the app restarts, we get the tasks.
+            case let .assetTaskInProgress(assetDownloadTask):
+                return assetDownloadTask
+            }
+        }
+    }
+
+    /// A closure executed once the local file URL is established for the AVURLAsset.
+    public typealias AssetDestination = ( _ location: URL) -> ()
+    
+    /// The AVAsset that can be played be used with an AVPlayerItem, during download
+    open var avAsset: AVURLAsset {
+        let avAssetDownloadTask  = task as! AVAssetDownloadTask
+        return avAssetDownloadTask.urlAsset
+    }
+
+    /// The progress of downloading the response data from the server for the request.
+    open var progress: Progress { return avAssetDownloadDelegate.progress }
+    
+    var avAssetDownloadDelegate: AVAssetDownloadTaskDelegate { return delegate as! AVAssetDownloadTaskDelegate }
+
+    // MARK: Progress
+    
+    /// Sets a closure to be called periodically during the lifecycle of the `Request` as data is read from the server.
+    ///
+    /// - parameter queue:   The dispatch queue to execute the closure on.
+    /// - parameter closure: The code to be executed periodically as data is read from the server.
+    ///
+    /// - returns: The request.
+    @discardableResult
+    open func downloadProgress(queue: DispatchQueue = DispatchQueue.main, closure: @escaping ProgressHandler) -> Self {
+        avAssetDownloadDelegate.progressHandler = (closure, queue)
+        return self
+    }
+}
+
