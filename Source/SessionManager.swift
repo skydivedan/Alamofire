@@ -902,7 +902,10 @@ open class AVAssetDownloadSessionManager : SessionManager {
     ///                                       challenges. `nil` by default.
     ///
     /// - returns: The new `SessionManager` instance.
-    public init(backgroundIdentifier: String, delegate: AVDownloadSessionDelegate, serverTrustPolicyManager: ServerTrustPolicyManager?) {
+    public init(
+        backgroundIdentifier: String,
+        delegate: AVDownloadSessionDelegate = AVDownloadSessionDelegate(),
+        serverTrustPolicyManager: ServerTrustPolicyManager? = nil) {
         let configuration = URLSessionConfiguration.background(withIdentifier: backgroundIdentifier)
         let session = AVAssetDownloadURLSession(configuration: configuration, assetDownloadDelegate: delegate, delegateQueue: nil)
         
