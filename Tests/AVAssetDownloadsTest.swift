@@ -51,7 +51,6 @@ class AVAssetDownloadTests: XCTestCase {
         
         XCTAssertNotNil(response?.avURLAsset)
         XCTAssertNotNil(response?.resolvedMediaSelection)
-        XCTAssertNotNil(response?.response)
         XCTAssertNil(response?.error)
         
         if #available(iOS 10.0, macOS 10.12, tvOS 10.0, *) {

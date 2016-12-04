@@ -18,9 +18,6 @@ public struct AVAssetDownloadResponse {
     /// The resolved media selection
     public let resolvedMediaSelection: AVMediaSelection?
     
-    /// The server's response to the URL request.
-    public let response: HTTPURLResponse?
-    
     /// The error encountered while executing or validating the request.
     public let error: Error?
     
@@ -29,10 +26,9 @@ public struct AVAssetDownloadResponse {
     
     var _metrics: AnyObject?
     
-    init(avURLAsset: AVURLAsset?, resolvedMediaSelection: AVMediaSelection?, response: HTTPURLResponse?, error: Error?, timeline: Timeline = Timeline()) {
+    init(avURLAsset: AVURLAsset?, resolvedMediaSelection: AVMediaSelection?, error: Error?, timeline: Timeline = Timeline()) {
         self.avURLAsset = avURLAsset
         self.resolvedMediaSelection = resolvedMediaSelection
-        self.response = response
         self.error = error
         self.timeline = timeline
     }
@@ -55,7 +51,6 @@ extension AVAssetDownloadResponse: CustomStringConvertible, CustomDebugStringCon
         
         output.append(avURLAsset != nil ? "[AVURLAsset]: \(avURLAsset!)" : "[AVURLAsset]: nil")
         output.append(resolvedMediaSelection != nil ? "[AVMediaSelection]: \(resolvedMediaSelection!)" : "[AVMediaSelection]: nil")
-        output.append(response != nil ? "[Response]: \(response!)" : "[Response]: nil")
         output.append("[Timeline]: \(timeline.debugDescription)")
         
         return output.joined(separator: "\n")
@@ -86,7 +81,6 @@ extension AVAssetDownloadRequest {
                 var avAssetResponse = AVAssetDownloadResponse(
                     avURLAsset: self.avAsset,
                     resolvedMediaSelection: self.avAssetDownloadDelegate.resolvedMediaSelection,
-                    response: self.response,
                     error: self.delegate.error,
                     timeline: self.timeline
                 )

@@ -672,7 +672,9 @@ open class AVAssetDownloadRequest: Request {
         case assetTaskInProgress(AVAssetDownloadTask)
         
         func task(session: URLSession, adapter: RequestAdapter?, queue: DispatchQueue) throws -> URLSessionTask {
-            guard let avSession = session as? AVAssetDownloadURLSession else { throw AVSessionError.NotAVAssetDownloadURLSession }
+            
+            guard session.responds(to: #selector(AVAssetDownloadURLSession.makeAssetDownloadTask(asset:destinationURL:options:))) else { throw AVSessionError.NotAVAssetDownloadURLSession }
+            let avSession = unsafeBitCast(session, to: AVAssetDownloadURLSession.self)
             
             switch self {
             case let .assetTitleArtwork(asset, title, artworkData, options):
@@ -700,6 +702,9 @@ open class AVAssetDownloadRequest: Request {
         let avAssetDownloadTask  = task as! AVAssetDownloadTask
         return avAssetDownloadTask.urlAsset
     }
+    
+    /// AVAssetDownloadTask doesn't actually respond to 'response'
+    override open var response: HTTPURLResponse? { return nil }
 
     /// The progress of downloading the response data from the server for the request.
     open var progress: Progress { return avAssetDownloadDelegate.progress }
